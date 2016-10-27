@@ -4,10 +4,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>React + Redux + AW</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,8 +25,460 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+
+				<!-- Intro -->
+				<section>
+					<section>
+						<h1>React + Redux + AW</h1>
+						<img class="home-logos" src="http://red-badger.com/blog/wp-content/uploads/2015/04/react-logo-1000-transparent.png" alt="">
+						<img class="home-logos" src="https://raw.githubusercontent.com/reactjs/redux/master/logo/logo.png" alt="">
+						<img class="home-logos" src="/img/academicworks_squarelogo_green.png" alt="">
+					</section>
+					<section>
+						<h2>Goals</h2>
+						<ol>
+							<li>Learn something new.</li>
+							<li>Feel empowered to dig into this code in our app.</li>
+						</ol>
+						<aside class="notes">
+							1. introduce a new frontend programming paradigm that we have added to our "toolbox" <br>
+							2. some of you want to get into this code, debug and a feature, etc
+						</aside>
+					</section>
+				</section>
+
+				<!-- jQuery -->
+				<section>
+					<section>
+						<h2>Confession...</h2>
+					</section>
+					<section>
+						I like jQuery
+						<aside class="notes">
+							- I know it's not the newest hottest thing in the front end world. <br>
+							- But it's how I started learning javascript. <br>
+							- I became very comfortable with the jQuery model of interacting with the DOM through selectors and event handlers
+						</aside>
+					</section>
+					<section>
+						Typical jQuery event handler
+						<pre><code data-trim>$( ".item" ).on( "click", doSomething );</code></pre>
+						<aside class="notes">
+							In jQuery, you write event handlers which modify the DOM.
+						</aside>
+					</section>
+					<section>
+						<p>But sometimes this gets messy...</p>
+						<aside class="notes">
+							- We are manually manipulating items on the DOM. <br>
+							- What happens in situations where an event has cascading effects? <br>
+							- Hard to manage state.
+						</aside>
+					</section>
+					<section>
+						<img src="http://mateoclarke.com/public/images/jquery-style-vs-react-style.png" alt="">
+						<aside class="notes">
+							- The model above is the definition of spaghetti code <br>
+							- With React, you write event handlers which update the state. And React handles DOM manipulation using render() to reflect the current state.
+						</aside>
+					</section>
+					<section>
+						<h2>DOM?</h2>
+						Document Object Model
+						<aside class="notes">
+							- but let's back up a second... <br>
+							- The DOM is the Document Object Model, most easy visualized when you open the Elements tab in your Browser Inspector. <br>
+							- It is a tree represention of the HTML <br>
+							- It is expensive to touch and change, its important try to make changes in batch.
+						</aside>
+					</section>
+					<section>
+						<h2>Virtual DOM</h2>
+						<aside class="notes">
+						- virtual DOM is React’s local and simplified copy of the Browser's DOM. <br>
+						- It allows React to do its computations within this abstracted world and skip the “real” DOM operations, which are often slow and can vary between browsers. <br>
+						- Instead of low-level techniques like traversing the DOM tree manually, you simple declare how a component should look like. React does the low-level job for you - the HTML DOM API methods are called under the hood.
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>React Components</h2>
+					</section>
+					<section>
+						<p>Most basic React Component</p>
+						<pre><code data-trim class="javascript">
+class HelloWorld extends React.Component {
+  render(){
+    return (
+      <p class&#8469;ame="greeting">Hello World</p>
+    );
+  }
+}
+
+// Example usage: &lt;HelloWorld /&gt;
+						</code></pre>
+
+						<aside class="notes">
+							But what's that weird XML looking stuff?
+						</aside>
+					</section>
+					<section>
+						<h3>Why JSX?</h3>
+					</section>
+					<section>
+						<p>because this is the alternative</p>
+						<pre><code>
+return React.createElement(
+  'p', {className: 'greeting'}, "Hello World"
+);
+						</code></pre>
+						<aside class="notes">
+							But image how messy this gets with nested HTML elements
+						</aside>
+					</section>
+					<section>
+						Nasty nested 🎄 code
+						<pre><code>
+React.createClass({displayName: "ExampleComponent",
+  render: function () {
+    return (
+      React.createElement("div", {className: "example"},
+       React.createElement("h1", null, "Example Component"),
+         React.createElement("ul", null, React.createElement("li", null, "One item"),
+           React.createElement("li", null, "Another item"))
+      )
+    );
+  }
+});
+						</code></pre>
+					</section>
+					<section>
+						<h3>JSX gotchas</h3>
+					</section>
+					<section>
+						You have to use <code>className</code> because<br>
+						<code>class</code> is a reserved word in JS.
+						<pre><code data-trim class="javascript">
+class HelloWorld extends React.Component {
+  render() {
+    return <p class&#8469;ame="greeting">Hello World</p>;
+  }
+}
+						</code></pre>
+						<aside class="notes">
+							Also note that you only have to wrap the JSX that is return in parens if it is more than one line.
+						</aside>
+					</section>
+					<section>
+						You can't render adjacent elements <br> without wrapping them in a parent element.
+						<br><em>This would error...</em>
+						<pre><code>
+...
+return (
+  <span>
+    Hello
+  </span>
+  <span>
+    World
+  </span>
+);
+						</code></pre>
+					</section>
+					<section>
+						You have to do something like this instead:
+						<pre><code data-trim class="javascript">
+class Profile extends React.Component {
+  render() {
+    return (
+      <div>
+        <img src="./user-avatar.jpg">
+        <span>{ this.props.displayName }</span>
+      </div>
+    );
+  }
+}
+						</code></pre>
+						<aside class="notes">
+							- Wait, what are those curly braces? <br>
+							- That's the way you insert JS code inside JSX, just like <% erb %> <br>
+							- Wait! what is that this.props.name you're calling?
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Props</h2>
+						<p>Passing data from one component to another</p>
+					</section>
+					<section>
+						Props are just like HTML attributes.
+						<pre><code>
+<input type="text">
+<p class="hi"></p>
+<img src="" alt="">
+						</code></pre>
+						They pass additional information to an element.
+					</section>
+					<section>
+						Call child component with the prop <code>tagline</code>...
+						<pre><code>
+return (
+  &lt;Header tagline="Thank You, Come Again!" /&gt;
+)
+						</code></pre>
+
+						Access data in child component via <code>this.props.tagline</code>
+						<pre><code>
+class Header extends React.Component {
+  ...
+  render(){
+    return &lt;h2&gt;{this.props.tagline}&lt;/h2&gt;
+  }
+}
+						</code></pre>
+					</section>
+					<section>
+						<a href="https://jsbin.com/xiviliv/edit?js,output" target="_blank">jsbin props</a>
+						<aside class="notes">
+							Talk about "Mounting Point in jsbin example".
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Events</h2>
+						<aside class="notes">
+							with jQuery, we would write an event listener, like the one I showed.
+						</aside>
+					</section>
+					<section>
+						Let's revisit that typical jQuery event handler
+						<pre><code class="javascript">
+$( ".item" ).on( "click", doSomething );
+						</code></pre>
+						<aside class="notes">
+							We grab an element using a jQuery selector, and attach an function to it that is executed when the event trigger occurs.
+						</aside>
+					</section>
+					<section>
+						<h2>Handling Events in React</h2>
+						<ul>
+							<li>use camelCase, rather than lowercase like you can do with HTML</li>
+							<li>With JSX you pass a function as the event handler, rather than a string.</li>
+						</ul>
+						<pre><code>
+&lt;button onClick={activateLasers}&gt;
+  Activate Lasers
+&lt;/button&gt;
+						</code></pre>
+						<aside class="notes">
+							explain the seperation of concerns clash (HTML, CSS, JS) vs (Components)
+						</aside>
+					</section>
+					<section>
+						<a href="https://jsbin.com/zaqahujuxu/edit?js,console,output" target="_blank">
+							jsbin events example
+						</a>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>State</h2>
+					</section>
+					<section>
+						<h3>Props are constant</h3>
+						<p>Values that get passed from parent to child components.</p>
+						<h3>State changes</h3>
+						<p>State is an object. Any component can have state.</p>
+
+						<aside class="notes">
+							And... values in the state can be passed from a parent to a child via props.
+						</aside>
+					</section>
+					<section>
+						The way we add state to a component is <br>with the class <code>constructor</code> method.
+						<pre><code>
+class App extends React.Component {
+  constructor() {
+    super();
+    // get initial state
+    this.state = {
+      foo: {}
+    };
+  }
+
+  updateFoo(foo) {
+    this.setState({
+      foo: foo
+    });
+  }
+
+  ...
+}
+
+
+						</code></pre>
+						<aside class="notes">
+							- Give it inital state.<br>
+							- Constructor just initializes an object instance from the class.<br>
+							- Super allow us to use the keyword this.
+						</aside>
+					</section>
+					<section>
+						<ul>
+							<li><a href="https://jsbin.com/pasakup/edit?js,output" target="_blank">jsbin toggle</a></li>
+							<li><a href="https://jsbin.com/xecileb/1/edit?css,js,output" target="_blank">jsbin svg</a></li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Stateless Functional Components</h2>
+					</section>
+					<section>
+						A more simple component
+						<pre><code>
+const DumbComponent = (props) => {
+  // no need for render() method
+
+  return (
+    <p>{props.text}</p>
+  );
+}
+						</code></pre>
+					</section>
+					<section>
+						<ul>
+							<li>Just a function that takes in props and spits out HTML.</li>
+							<li>Removes the need to bind the this keyword. (Feature of ES6 arrow function)</li>
+							<li>Signals that this component is dumb/presentational.</li>
+							<li>UI not behavior</li>
+							<li>Protects from lazily dropping in state or lifecycle methods</li>
+						</ul>
+					</section>
+					<section>
+						<ul>
+							<li><a href="https://jsbin.com/dulufif/edit?js,console,output" target="_blank">jsbin stateless svg</a></li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section><h2>Redux</h2></section>
+					<section>
+						<h3>What problem does Redux solve?</h3>
+						<ul>
+							<li>Provides a way to centralize the state of a front end application.</li>
+							<li>It's goal is to be a predictable state container.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Concepts in Redux</h3>
+						<ul>
+							<li>Components</li>
+							<li>Containers</li>
+							<li>Store</li>
+							<li>Actions</li>
+							<li>Reducers</li>
+							<li>Selectors</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Components</h2>
+						<ul>
+							<li>As dumb as possible</li>
+							<li>Solely responsible for for the way things look</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Containers</h2>
+						<ul>
+							<li>Can be thought of as "smart" parent components</li>
+							<li>Pass sections of the store to child components</li>
+							<li>Also delegate what actions components can dispatch</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Store</h2>
+						<ul>
+							<li>Master version of the initial state</li>
+							<li>Will usually have several seperate branches of state</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Actions</h2>
+						<ul>
+							<li>Responds to events. User triggered, AJAX, etc.</li>
+							<li>Sends a payload of the current state + the type of event that occured</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Reducers</h2>
+						<ul>
+							<li>Take information about the state and what action occured</li>
+							<li>Spits out an updated version of the state</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Selectors</h2>
+						<ul>
+							<li>Efficiently computes and stores derived data</li>
+							<li>Only recomputes if one if its arguement changes</li>
+							<li>Common use case is calculating numbers (ie. currency)</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>React Rails</h2>
+					</section>
+					<section>
+						<ul>
+							<li>Adds Babel to our Asset Pipeline so we can transpile JSX & ES6</li>
+							<li>Gives us a Ruby helper method to drop a mounting point into Rails Views</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code class="ruby">
+# View Helper's Signature
+react_component(component_class_name, props={}, html_options={})
+
+# Our Usage
+react_component("SM.ACARootComponent", @operation.to_hash)
+						</code></pre>
+						<aside class="notes">
+							- component_class_name is a string <br>
+							- props is either an object that responds to #to_json or an already-stringified JSON object <br>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<h2>Resources</h2>
+					<ul>
+						<li>
+							<a href="http://reactfordesigners.com/labs/reactjs-introduction-for-people-who-know-just-enough-jquery-to-get-by/">React For People Who Know Just Enough jQuery To Get By</a>
+						</li>
+						<li>
+							<a href="https://facebook.github.io/react/tutorial/tutorial.html">Facebook React Tutorial</a>
+						</li>
+						<li><a href="http://courses.reactjsprogram.com/p/reactjsfundamentals">React.js Fundamentals by Tyler McGinnis</a></li>
+						<li><a href="https://egghead.io/courses/getting-started-with-redux">Getting Started with Redux
+ by Dan Abramov</a></li>
+ 						<li><a href="https://code-cartoons.com/a-cartoon-intro-to-redux-3afb775501a6#.6mvb4wo5g">Cartoon Intro to Redux</a></li>
+					 <li><a href="https://learnredux.com/">Learn Redux by Wes Bos</a></li>
+					 <li><a href="https://www.dropbox.com/sh/he93ps0g0x37olw/AAAxmoOPpsLac439AShPt4oTa?dl=0">React for Beginners by Wes Bos (AW Dropbox > Engineering > Library)</a></li>
+					</ul>
+				</section>
+
+
 			</div>
 		</div>
 

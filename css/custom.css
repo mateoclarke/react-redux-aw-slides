@@ -1,0 +1,10 @@
+.black {
+  color: black !important;
+}
+
+img.home-logos {
+  max-width: 250px !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 20px !important;
+}
